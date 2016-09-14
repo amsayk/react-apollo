@@ -11,6 +11,11 @@ declare module 'lodash.isequal' {
   export = main.isEqual;
 }
 
+declare module 'lodash.pick' {
+  import main = require('lodash');
+  export = main.pick;
+}
+
 declare module 'recompose/compose' {
   function hoc(component: any): any;
   export default (...hocs) => hoc;
