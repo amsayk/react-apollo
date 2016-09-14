@@ -496,13 +496,16 @@ export interface UpdateQueryOptions {
 }
 export class ObservableQuery extends Observable<ApolloQueryResult> {
     refetch: (variables?: any) => Promise<ApolloQueryResult>;
+    setVariables: (variables: any) => Promise<ApolloQueryResult>;
     fetchMore: (options: FetchMoreQueryOptions & FetchMoreOptions) => Promise<any>;
-    startGraphQLSubscription: (options: GraphQLSubscriptionOptions) => number;
     updateQuery: (mapFn: (previousQueryResult: any, options: UpdateQueryOptions) => any) => void;
     stopPolling: () => void;
     startPolling: (p: number) => void;
     options: WatchQueryOptions;
     queryId: string;
+    variables: {
+        [key: string]: any;
+    };
     private scheduler;
     private queryManager;
     constructor({scheduler, options, shouldSubscribe}: {
@@ -511,6 +514,7 @@ export class ObservableQuery extends Observable<ApolloQueryResult> {
         shouldSubscribe?: boolean;
     });
     result(): Promise<ApolloQueryResult>;
+    currentResult(): ApolloQueryResult;
 }
 }
 declare module 'apollo-client/ObservableQuery' {
