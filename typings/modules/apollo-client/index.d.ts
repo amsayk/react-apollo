@@ -514,7 +514,7 @@ export class ObservableQuery extends Observable<ApolloQueryResult> {
         shouldSubscribe?: boolean;
     });
     result(): Promise<ApolloQueryResult>;
-    currentResult(): ApolloQueryResult;
+    currentResult({ returnPartialData: boolean }): ApolloQueryResult;
 }
 }
 declare module 'apollo-client/ObservableQuery' {

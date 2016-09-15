@@ -213,26 +213,20 @@ export default function graphql(
 
     function fetchData(props, { client }) {
       if (operation.type === DocumentType.Mutation) return false;
+
       const opts = calculateOptions(props) as any;
-      opts.query = document;
+      if (opts.ssr === false || opts.skip) return false;
 
-      if (opts.ssr === false) return false;
-      if (!opts.variables) delete opts.variables;
+      const observable = client.watchQuery(assign({ query: document }, opts));
+      const result = observable.currentResult();
 
-      // if this query is in the store, don't block execution
-      try {
-        readQueryFromStore({
-          store: client.store.getState()[client.reduxRootKey].data,
-          query: opts.query,
-          variables: opts.variables,
-          fragmentMap: createFragmentMap(opts.fragments),
-        });
+      console.log({result})
+      if (result.loading) {
+        return observable.result();
+      } else {
         return false;
-      } catch (e) {/* tslint:disable-line */}
-
-      return client.query(opts);
+      }
     }
-
 
     class GraphQL extends Component<any, any> {
       static displayName = graphQLDisplayName;
@@ -357,8 +351,12 @@ export default function graphql(
         assign(this.data, observableQueryFields(this.queryObservable));
 
         if (!opts.forceFetch) {
+          const currentResult = this.queryObservable.currentResult({
+            returnPartialData: true,
+          });
+          console.log({ currentResult })
           // try and fetch initial data from the store
-          assign(this.data, this.queryObservable.currentResult());
+          assign(this.data, currentResult.data, { loading: currentResult.loading });
         }
       }
 

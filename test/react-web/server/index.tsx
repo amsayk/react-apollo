@@ -11,8 +11,7 @@ import mockNetworkInterface from '../../mocks/mockNetworkInterface';
 
 const { expect } = chai;
 
-// XXX: still need to do SSR
-describe.skip('SSR', () => {
+describe('SSR', () => {
   // it('should render the expected markup', (done) => {
 
   //   const query = gql`query ssr { allPeople(first: 1) { people { name } } }`;
@@ -36,7 +35,7 @@ describe.skip('SSR', () => {
   // });
 
   describe('`getDataFromTree`', () => {
-    it('should run through all of the queries that want SSR', (done) => {
+    it.only('should run through all of the queries that want SSR', () => {
 
       const query = gql`{ currentUser { firstName } }`;
       const data = { currentUser: { firstName: 'James' } };
@@ -46,19 +45,19 @@ describe.skip('SSR', () => {
       const apolloClient = new ApolloClient({ networkInterface });
 
       const WrappedElement = graphql(query)(({ data }) => (
+        console.log({ data }) ||
         <div>{data.loading ? 'loading' : data.currentUser.firstName}</div>
       ));
 
       const app = (<ApolloProvider client={apolloClient}><WrappedElement /></ApolloProvider>);
 
-      getDataFromTree(app)
+      return getDataFromTree(app)
         .then(() => {
+          console.log('done!')
+          console.log(apolloClient.store.getState().apollo.queriesx)
           const markup = ReactDOM.renderToString(app);
           expect(markup).to.match(/James/);
-          done();
-        })
-        .catch(console.error)
-        ;
+        });
     });
 
     it('should run return the initial state for hydration', (done) => {
